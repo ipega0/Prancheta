@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b3a5c">
+<title>Prancheta de Vôlei</title>
+<style>
+:root{--bg:#eef2f6;--pn:#fff;--tx:#14233a;--mu:#5b6b80;--bd:#d3dbe6;--ac:#1d4ed8;--at:#fff;--hv:#e8eef7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1520;--pn:#16212f;--tx:#e8eef6;--mu:#9aabbf;--bd:#2a3a4e;--ac:#60a5fa;--at:#08121f;--hv:#1f2e42}}
+:root[data-theme="dark"]{--bg:#0d1520;--pn:#16212f;--tx:#e8eef6;--mu:#9aabbf;--bd:#2a3a4e;--ac:#60a5fa;--at:#08121f;--hv:#1f2e42}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--tx);font:14px/1.35 "Avenir Next","Segoe UI",system-ui,sans-serif;overflow:hidden}
+.app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+header{display:flex;align-items:baseline;gap:10px;padding:8px 14px;background:var(--pn);border-bottom:1px solid var(--bd)}
+header b{font-size:17px}header small{color:var(--mu)}
+main{min-height:0;padding:6px}
+#c{width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
+.pl{cursor:grab}
+.pan{display:flex;flex-direction:column;height:36vh;background:var(--pn);border-top:1px solid var(--bd)}
+.tabs{display:flex}
+.tabs button{flex:1;border:0;border-bottom:3px solid transparent;border-radius:0;background:none;font-weight:700;color:var(--mu)}
+.tabs button.on{color:var(--ac);border-color:var(--ac);background:none}
+#msg{padding:4px 14px 0;min-height:20px;font-size:12px;color:var(--mu)}
+.tp{display:none;flex:1;min-height:0;overflow:auto;padding:2px 14px 16px}.tp.on{display:block}
+h3{margin:12px 0 0;font-size:12px;color:var(--mu)}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.f{flex:1}
+button,input,select{font:inherit;color:inherit}
+button,select{min-height:40px;background:var(--pn);border:1px solid var(--bd);border-radius:9px;padding:8px 11px;cursor:pointer}
+button:hover{background:var(--hv)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+button.on{background:var(--ac);color:var(--at);border-color:var(--ac)}
+button.blu{border-color:#2563eb;color:#2563eb}button.red{border-color:#dc2626;color:#dc2626}
+input{width:100%;margin-top:6px;background:var(--pn);border:1px solid var(--bd);border-radius:9px;padding:9px 10px}
+.li{display:flex;align-items:center;gap:6px;margin-top:6px}.li .n{flex:1;text-align:left}
+.mu{margin:8px 0 0;color:var(--mu)}
+.li input{flex:1;min-width:0;margin:0}.dot{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700}.dot.a{background:#2563eb}.dot.b{background:#dc2626}
+#ov{position:fixed;inset:0;z-index:9;display:grid;place-items:center;background:var(--bg);padding:max(20px,env(safe-area-inset-top)) 20px max(20px,env(safe-area-inset-bottom));overflow:auto}#ov[hidden]{display:none}.card{width:100%;max-width:380px}.card h2{margin:0 0 4px;font-size:24px}.sw{width:36px;height:36px;min-height:0;padding:0;border:3px solid transparent;border-radius:50%}.sw.on{border-color:var(--tx)}#who{margin-left:auto;min-height:36px;padding:4px 10px}textarea{width:100%;margin-top:6px;font:inherit;color:inherit;background:var(--pn);border:1px solid var(--bd);border-radius:9px;padding:9px 10px}#tr .li{flex-wrap:wrap}#tr .n{flex:1 1 100%}
+@media(min-width:900px){.app{grid-template-columns:370px 1fr;grid-template-rows:auto minmax(0,1fr)}header{grid-column:1/-1}.pan{grid-column:1;grid-row:2;height:auto;border-top:0;border-right:1px solid var(--bd)}main{grid-column:2;grid-row:2}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="ov" hidden><div class="card"><h2>Prancheta de Vôlei</h2><p class="mu" id="ovt"></p><div id="pl"></div><h3>Novo perfil</h3><input id="pn" maxlength="20" placeholder="Seu nome" autocomplete="off"><div class="row" id="cs"></div><div class="row"><button class="f on" id="pc">Criar perfil e entrar</button></div></div></div>
+<div class="app">
+<header><b>Prancheta de Vôlei</b><small>quadra FIVB 18 × 9 m</small><button id="who" aria-label="Trocar de perfil"></button></header>
+<main><svg id="c" viewBox="0 0 600 960" preserveAspectRatio="xMidYMid meet" aria-label="Quadra de vôlei"></svg></main>
+<section class="pan">
+ <div class="tabs"><button class="on" data-p="0">Quadra</button><button data-p="3">Elenco</button><button data-p="1">Jogadas</button><button data-p="2">Treinos</button></div>
+ <div id="msg"></div>
+ <div class="tp on" id="p0">
+  <h3>Jogadores e bola</h3>
+  <div class="row"><button class="f blu" id="aa">+ Meu time</button><button class="f red" id="ab">+ Adversário</button></div>
+  <div class="row"><button class="f" id="rm">Remover selecionado</button><button class="f" id="ball">Bola</button></div>
+  <input id="nm" maxlength="14" autocomplete="off" disabled>
+  <h3>Rotação e formações</h3>
+  <div class="row"><button class="f" id="ra">Rodar meu time ↻</button><button class="f" id="rb">Rodar adversário ↻</button></div>
+  <div class="row"><select class="f" id="pre" aria-label="Formações prontas"></select><button id="rs">Reiniciar quadra</button></div>
+  <h3>Setas de movimento e passe</h3>
+  <div class="row"><button class="f on" data-t="move">Mover</button><button class="f" data-t="arrow">Desenhar seta</button></div>
+  <div class="row"><button class="f" id="ud">Desfazer seta</button><button class="f" id="cl">Limpar setas</button><button class="f on" id="zn">Zonas 1–6</button></div>
+ </div>
+ <div class="tp" id="p1">
+  <div class="row"><button class="f on" id="sf">Salvar jogada</button><button class="f" id="uf">Atualizar jogada</button></div>
+  <div id="fr"></div>
+  <div class="row"><button class="f" id="pp"></button><select id="sp" aria-label="Velocidade"><option value=".5">0,5x</option><option value="1" selected>1x</option><option value="2">2x</option></select></div>
+ </div>
+ <div class="tp" id="p3"><p class="mu">Os nomes ficam salvos neste aparelho e aparecem em todas as jogadas.</p><div id="ro"></div></div>
+ <div class="tp" id="p2">
+  <input id="tn" maxlength="30" placeholder="Nome do treino" autocomplete="off">
+  <div class="row"><button class="f" id="st">Salvar treino</button></div>
+  <div id="tr"></div>
+  <h3>Compartilhar e importar</h3>
+  <textarea id="cd" rows="3" placeholder="Cole aqui o código de um treino recebido"></textarea>
+  <div class="row"><button class="f" id="im">Importar treino</button></div>
+ </div>
+</section>
+</div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],svg=$("#c");
+const L=(a,b,t)=>a+(b-a)*t,ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2,cl=o=>JSON.parse(JSON.stringify(o)),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+/* quadra FIVB 18 x 9 m, 40 unidades por metro; posições 1-6 vistas da rede */
+const SL={1:[420,770],2:[420,560],3:[300,560],4:[180,560],5:[180,770],6:[300,770]};
+const sp0=(t,s)=>t=="a"?SL[s]:[600-SL[s][0],960-SL[s][1]];
+const COURT=`<defs><marker id="m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#fff"/></marker></defs>
+<rect width="600" height="960" fill="#1b3a5c"/><rect x="120" y="120" width="360" height="720" fill="#d9783a"/><rect x="120" y="360" width="360" height="240" fill="#eaa062"/>
+<g fill="none" stroke="#fff" stroke-width="2.5"><rect x="120" y="120" width="360" height="720"/><path d="M120 480H480M120 360H480M120 600H480"/><path d="M50 360H120M480 360H550M50 600H120M480 600H550" stroke-dasharray="6 8" stroke-width="3"/><path d="M120 848V854M480 848V854M120 112V106M480 112V106" stroke-width="3"/></g>
+<g id="zz" fill="#fff" fill-opacity=".25" font-size="54" font-weight="700" text-anchor="middle">${[1,2,3,4,5,6].map(s=>`<text x="${SL[s][0]}" y="${SL[s][1]+19}">${s}</text><text x="${600-SL[s][0]}" y="${960-SL[s][1]+19}">${s}</text>`).join("")}</g>
+<g fill="#fff" fill-opacity=".8" font-size="12" text-anchor="middle"><text x="300" y="876">Zona de saque</text><text x="300" y="96">Zona de saque</text><text x="84" y="424">3 m</text><text x="84" y="544">3 m</text><text x="552" y="484">Rede</text></g>
+<rect x="96" y="476" width="408" height="8" fill="#0e1b2a" fill-opacity=".9"/><rect x="96" y="476" width="408" height="3" fill="#fff"/><path d="M92 470V490M508 470V490" stroke="#cfd6df" stroke-width="8"/><path d="M120 462V498M480 462V498" stroke="#ef4444" stroke-width="4"/>
+<g id="dyn"></g>`;
+svg.innerHTML=COURT;
+let roster={},PID=null;const gj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},sj=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},K=n=>"vb:"+PID+":"+n;let perfis=gj("vb-perfis",[]);
+const saveR=()=>sj(K("elenco"),roster);
+const base=()=>{const p=[];["a","b"].forEach(t=>{for(let s=1;s<=6;s++){const[x,y]=sp0(t,s);p.push({id:t+s,t,n:s,s,x,y,nm:roster[t+s]||""})}});return{p,ball:{x:300,y:640},ar:[]}};
+const PRE={"Recepção em W":{a:{5:[170,700],4:[235,610],6:[300,725],3:[365,610],1:[430,700],2:[420,525]},b:{1:[190,92]},ball:[190,92]},
+"Bloqueio duplo":{a:{2:[445,508],3:[385,508],4:[190,570],1:[450,700],6:[330,700],5:[200,730]},b:{4:[420,420]},ball:[420,438]},
+"Defesa de perímetro":{a:{3:[300,508],4:[170,600],2:[430,600],5:[180,735],6:[300,785],1:[420,735]},b:{3:[300,420]},ball:[300,438]}};
+let S=base(),frames=[],cur=-1,tool="move",sel=null,anim=0,raf=0,drag=null,tmp=null,trs=[],sp=1,zon=true;
+const load=()=>gj(K("treinos"),[]),store=a=>sj(K("treinos"),a),savePrefs=()=>sj(K("prefs"),{zon,sp});
+const pos=(st,id)=>id=="B"?st.ball:st.p.find(q=>q.id==id);
+function draw(st,sel){
+ let h="";
+ st.ar.forEach(a=>h+=`<path d="M${a.x1} ${a.y1}L${a.x2} ${a.y2}" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="10 7" stroke-linecap="round" marker-end="url(#m)"/>`);
+ st.p.forEach(q=>{const on=sel==q.id;
+  h+=`<g class="pl" data-id="${q.id}"><circle cx="${q.x}" cy="${q.y}" r="32" fill="transparent"/><circle cx="${q.x}" cy="${q.y}" r="22" fill="${q.t=="a"?"#2563eb":"#dc2626"}" stroke="${on?"#ffd23f":"#fff"}" stroke-width="${on?5:3}"/><text x="${q.x}" y="${q.y+8}" text-anchor="middle" font-size="22" font-weight="700" fill="#fff" pointer-events="none">${q.n}</text>${q.nm?`<text x="${q.x}" y="${q.y+40}" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" stroke="#0e1b2a" stroke-width="3" paint-order="stroke" pointer-events="none">${q.nm.replace(/[<&]/g,"")}</text>`:""}</g>`});
+ if(st.ball)h+=`<g class="pl" data-id="B"><circle cx="${st.ball.x}" cy="${st.ball.y}" r="26" fill="transparent"/><circle cx="${st.ball.x}" cy="${st.ball.y}" r="13" fill="#ffd23f" stroke="#0e1b2a" stroke-width="2.5"/></g>`;
+ svg.querySelector("#dyn").innerHTML=h}
+function mix(A,B,t){
+ const o={ar:A.ar,p:[],ball:null},ids=new Set([...A.p,...B.p].map(q=>q.id));
+ ids.forEach(id=>{const a=A.p.find(q=>q.id==id),b=B.p.find(q=>q.id==id);
+  if(a&&b)o.p.push({...b,x:L(a.x,b.x,t),y:L(a.y,b.y,t)});else if(a&&t<.5)o.p.push(a);else if(b&&t>=.5)o.p.push(b)});
+ o.ball=A.ball&&B.ball?{x:L(A.ball.x,B.ball.x,t),y:L(A.ball.y,B.ball.y,t)}:t<.5?A.ball:B.ball;return o}
+const render=()=>draw(tmp?{...S,ar:[...S.ar,tmp]}:S,sel),msg=t=>{$("#msg").textContent=t||""};
+
+/* arrastar jogadores, bola e setas */
+const pt=e=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())};
+svg.addEventListener("pointerdown",e=>{if(anim)return;
+ const p=pt(e),g=e.target.closest("[data-id]"),o=g&&pos(S,g.dataset.id);
+ if(tool=="arrow"){tmp={x1:o?o.x:p.x,y1:o?o.y:p.y,x2:p.x,y2:p.y};drag={ar:1}}
+ else if(o){sel=g.dataset.id=="B"?null:g.dataset.id;drag={id:g.dataset.id,dx:p.x-o.x,dy:p.y-o.y,sx:e.clientX,sy:e.clientY};ui()}
+ else{sel=null;ui();return render()}
+ svg.setPointerCapture(e.pointerId);render()});
+svg.addEventListener("pointermove",e=>{if(!drag)return;const p=pt(e);
+ if(drag.ar){tmp.x2=p.x;tmp.y2=p.y;return render()}
+ if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>4)drag.moved=1;
+ if(!drag.moved)return;const o=pos(S,drag.id);o.x=clamp(p.x-drag.dx,20,580);o.y=clamp(p.y-drag.dy,20,940);render()});
+svg.addEventListener("pointerup",()=>{if(drag&&drag.ar&&tmp){if(Math.hypot(tmp.x2-tmp.x1,tmp.y2-tmp.y1)>25)S.ar.push(tmp);tmp=null;render()}drag=null});
+svg.addEventListener("pointercancel",()=>{tmp=null;drag=null;render()});
+
+/* painel: jogadores, rotação, formações */
+$$(".tabs button").forEach(b=>b.onclick=()=>{$$(".tabs button").forEach(x=>x.classList.toggle("on",x==b));$$(".tp").forEach(x=>x.classList.toggle("on",x.id=="p"+b.dataset.p));ui()});
+function add(t){if(anim)return;
+ const u=S.p.filter(q=>q.t==t),n=[1,2,3,4,5,6,7,8,9,10,11,12].find(i=>!u.some(q=>q.n==i));
+ if(!n)return msg("Máximo de 12 jogadores por time.");
+ const s=[1,2,3,4,5,6].find(i=>!u.some(q=>q.s==i))||0,[x,y]=s?sp0(t,s):[t=="a"?55:545,t=="a"?600+(u.length-6)*50:360-(u.length-6)*50];
+ S.p.push({id:t+n,t,n,s,x,y,nm:roster[t+n]||""});sel=t+n;ui();render()}
+function rot(t){if(anim)return;S.p.forEach(q=>{if(q.t==t&&q.s){q.s=q.s==1?6:q.s-1;[q.x,q.y]=sp0(t,q.s)}});render();msg("Time girou no sentido horário: 2→1→6→5→4→3→2.")}
+$("#aa").onclick=()=>add("a");$("#ab").onclick=()=>add("b");$("#ra").onclick=()=>rot("a");$("#rb").onclick=()=>rot("b");
+$("#rm").onclick=()=>{if(anim)return;if(!sel)return msg("Toque num jogador para selecioná-lo.");S.p=S.p.filter(q=>q.id!=sel);sel=null;ui();render()};
+$("#ball").onclick=()=>{if(anim)return;S.ball=S.ball?null:{x:300,y:640};ui();render()};
+$("#rs").onclick=()=>{if(anim)return;S=base();sel=null;ui();render()};
+$("#pre").innerHTML='<option value="">Formações prontas…</option>'+Object.keys(PRE).map(k=>`<option>${k}</option>`).join("");
+$("#pre").onchange=e=>{const P=PRE[e.target.value];e.target.value="";if(!P||anim)return;
+ S=base();sel=null;S.p.forEach(q=>{const v=(P[q.t]||{})[q.n];if(v){q.x=v[0];q.y=v[1]}});S.ball={x:P.ball[0],y:P.ball[1]};ui();render();msg("Formação aplicada. Ajuste e salve como jogada.")};
+$("#zn").onclick=()=>{zon=!zon;savePrefs();ui()};
+$$("[data-t]").forEach(b=>b.onclick=()=>{tool=b.dataset.t;ui();msg(tool=="arrow"?"Arraste na quadra (ou a partir de um jogador) para desenhar uma seta.":"")});
+$("#ud").onclick=()=>{S.ar.pop();render()};$("#cl").onclick=()=>{S.ar=[];render()};
+const E=s=>(s||"").replace(/[&<>"]/g,c=>"&#"+c.charCodeAt(0)+";"),named=fs=>{fs.forEach(f=>f.p.forEach(q=>{if(roster[q.id])q.nm=roster[q.id]}));return fs};
+function setName(id,raw){const v=raw.trim(),q=pos(S,id);if(!q)return;q.nm=v;if(v)roster[id]=v;else delete roster[id];saveR();
+ frames.forEach(f=>{const p=pos(f,id);if(p)p.nm=v});if(!anim)render();msg(v?"Nome salvo no elenco.":"Nome removido do elenco.")}
+function ro(){const l=[...S.p].sort((x,y)=>x.t==y.t?x.n-y.n:x.t<y.t?-1:1);
+ $("#ro").innerHTML=l.length?l.map(q=>`<label class="li"><span class="dot ${q.t}">${q.n}</span><input data-id="${q.id}" maxlength="14" autocomplete="off" value="${E(q.nm)}" placeholder="${q.t=="a"?"Meu time":"Adversário"}, jogador ${q.n}"></label>`).join(""):`<p class="mu">Adicione jogadores na quadra para nomeá-los.</p>`}
+$("#nm").oninput=e=>{if(sel)setName(sel,e.target.value)};
+$("#ro").oninput=e=>{const i=e.target.closest("input");if(!i)return;setName(i.dataset.id,i.value);if(sel==i.dataset.id)$("#nm").value=i.value};
+
+/* jogadas (quadros) e treinos */
+$("#sf").onclick=()=>{if(anim)return;frames.push(cl(S));cur=frames.length-1;msg("Jogada "+frames.length+" salva.");ui()};
+$("#uf").onclick=()=>{if(anim||cur<0)return msg("Abra uma jogada da lista para atualizá-la.");frames[cur]=cl(S);msg("Jogada "+(cur+1)+" atualizada.")};
+$("#fr").onclick=e=>{if(anim)return;const b=e.target.closest("button");if(!b)return;const i=+b.dataset.i;
+ if(b.dataset.a=="del"){frames.splice(i,1);cur=cur==i?-1:cur>i?cur-1:cur}else{S=cl(frames[i]);cur=i;sel=null}ui();render()};
+$("#sp").onchange=e=>{sp=+e.target.value;savePrefs()};
+$("#pp").onclick=()=>anim?stop():play(cl(frames));
+$("#st").onclick=()=>{if(!frames.length)return msg("Salve ao menos uma jogada antes de salvar o treino.");
+ const n=$("#tn").value.trim()||"Treino "+(trs.length+1);trs.push({name:n,frames:cl(frames)});store(trs);$("#tn").value="";msg("Treino “"+n+"” salvo neste aparelho.");ui()};
+$("#tr").onclick=e=>{const b=e.target.closest("button");if(!b)return;const i=+b.dataset.i,t=trs[i];
+ if(b.dataset.a=="del"){trs.splice(i,1);store(trs)}
+ else if(b.dataset.a=="open"){stop();frames=tf(t);cur=0;S=cl(frames[0]);sel=null;msg("Treino carregado em Jogadas.")}
+ else if(b.dataset.a=="dl")return download({name:t.name,frames:tf(t)});
+ else if(b.dataset.a=="sh")return share(t);
+ else return play(tf(t));
+ ui();render()};
+
+/* animação */
+function play(f){if(!f.length)return msg("Salve ao menos uma jogada para reproduzir.");
+ stop();anim=1;sel=null;tmp=null;ui();
+ const H=600/sp,M=1800/sp,per=M+H,n=f.length-1,t0=performance.now();
+ const tick=now=>{if(!anim)return;const e=now-t0-H;
+  if(e<0)draw(f[0]);
+  else{const i=Math.floor(e/per);if(i>=n){S=cl(f[n]);stop();return}
+   const r=e-i*per;draw(r>=M?f[i+1]:mix(f[i],f[i+1],ease(r/M)))}
+  raf=requestAnimationFrame(tick)};
+ raf=requestAnimationFrame(tick)}
+function stop(){anim=0;cancelAnimationFrame(raf);ui();render()}
+
+/* baixar treino: arquivo HTML independente que reproduz a animação */
+function buildPlayer(t){
+ const nm=t.name.replace(/[<&]/g,""),data=JSON.stringify(t.frames).replace(/</g,"\\u003c");
+ return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${nm}</title>
+<style>html,body{margin:0;height:100%;background:#0d1520;color:#e8eef6;font:15px system-ui,sans-serif}body{display:flex;flex-direction:column}h1{font-size:16px;margin:0;padding:10px;text-align:center}#c{flex:1;min-height:0;width:100%;padding:6px}.bar{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 10px 16px}button,select{font:inherit;border:0;border-radius:9px;padding:9px 14px}button{background:#60a5fa;color:#08121f}select{background:#1f2e42;color:#e8eef6}</style></head><body>
+<h1>${nm}</h1><svg id="c" viewBox="0 0 600 960"></svg>
+<div class="bar"><button id="pp">Pausar</button><button id="rs">Reiniciar</button><span id="lb"></span><select id="sp"><option value=".5">0,5x</option><option value="1" selected>1x</option><option value="2">2x</option></select></div>
+<script>
+const f=${data},svg=document.getElementById("c"),$=s=>document.querySelector(s);svg.innerHTML=${JSON.stringify(COURT)};
+const L=${L},ease=${ease};
+${draw}
+${mix}
+const H=700,M=1800,per=M+H,n=f.length-1,total=H+n*per;let T=0,play=1,sp=1,last=performance.now();
+function show(){const e=T-H;let k=1;if(e<0)draw(f[0]);else{const i=Math.floor(e/per);if(i>=n){draw(f[n]);k=n+1}else{const r=e-i*per;if(r>=M){draw(f[i+1]);k=i+2}else{draw(mix(f[i],f[i+1],ease(r/M)));k=i+1}}}$("#lb").textContent="Jogada "+k+" de "+(n+1)}
+function tick(now){if(play){T=Math.min(total,T+Math.min(now-last,100)*sp);if(T>=total){play=0;$("#pp").textContent="Assistir de novo"}}last=now;show();requestAnimationFrame(tick)}
+$("#pp").onclick=function(){if(play){play=0;this.textContent="Continuar"}else{if(T>=total)T=0;play=1;this.textContent="Pausar"}};
+$("#rs").onclick=()=>{T=0;play=1;$("#pp").textContent="Pausar"};$("#sp").onchange=function(){sp=+this.value};
+requestAnimationFrame(tick);
+<\/script></body></html>`}
+async function download(t){
+ const fn=(t.name.replace(/[^\p{L}\p{N} _-]/gu,"").trim()||"treino")+".html",html=buildPlayer(t);
+ try{const d=window.claude?await claude.use("downloads"):null;
+  if(d)await d.save({filename:fn,data:html});
+  else{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([html],{type:"text/html"}));a.download=fn;a.click()}
+  msg("Arquivo pronto. Abra o .html salvo para assistir ao treino.")}
+ catch(e){msg(e&&e.code=="declined"?"Download cancelado.":"Não foi possível baixar o
